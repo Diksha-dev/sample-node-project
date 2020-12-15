@@ -1,38 +1,18 @@
-'use strict';
-// Module Dependencies
-// -------------------
-var express     = require('express');
-var bodyParser  = require('body-parser');
-var errorhandler = require('errorhandler');
-var http        = require('http');
-var path        = require('path');
-var request     = require('request');
-var routes      = require('./routes');
-var activity    = require('./routes/activity');
+var http = require('http');
+var express = require('express');
 
 var app = express();
 
-// Configure Express
-app.set('port', process.env.PORT || 3000);
-app.use(bodyParser.raw({type: 'application/jwt'}));
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.set('port', process.env.PORT || 3005); // GİRİŞ PORTU AYARLANDI
+app.set('views', __dirname + '/app/server/views'); // VIEW KLASÖRÜ TANITILDI
+//app.set('view engine', 'ejs'); // VIEW ENGINE AYARLANDI
+app.use(express.static(__dirname + '/app/public')); // KULLANICILAR TARAFINDAN ERİŞİLEBİLEN KLASÖR TANIMLANDI
 
-//app.use(express.methodOverride());
-//app.use(express.favicon());
+require('./app/routes')(app); // ROUTE DOSYASI ÇAĞIRILDI
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Express in Development Mode
-if ('development' == app.get('env')) {
-  app.use(errorhandler());
-}
-
-// HubExchange Routes
-app.get('/', routes.index );
-app.post('/login', routes.login );
-app.post('/logout', routes.logout );
-
-
+/*
+HTTP SERVER OLUŞTURULDU
+*/
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+	console.log('Sistem ' + app.get('port') + ' Portu Üzerinde Çalışıyor.');
 });
