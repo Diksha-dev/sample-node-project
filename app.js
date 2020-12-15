@@ -1,25 +1,38 @@
-/*
-
-GEREKLİ PAKETLER YÜKLENİYOR...
-
-*/
-var http = require('http');
-var express = require('express');
+'use strict';
+// Module Dependencies
+// -------------------
+var express     = require('express');
+var bodyParser  = require('body-parser');
+var errorhandler = require('errorhandler');
+var http        = require('http');
+var path        = require('path');
+var request     = require('request');
+var routes      = require('./routes');
+var activity    = require('./routes/activity');
 
 var app = express();
 
-app.set('port', process.env.PORT || 3005); // GİRİŞ PORTU AYARLANDI
-app.set('views', __dirname + '/app/server/views'); // VIEW KLASÖRÜ TANITILDI
-app.set('view engine', 'ejs'); // VIEW ENGINE AYARLANDI
-app.use(express.static(__dirname + '/app/public')); // KULLANICILAR TARAFINDAN ERİŞİLEBİLEN KLASÖR TANIMLANDI
+// Configure Express
+app.set('port', process.env.PORT || 3000);
+app.use(bodyParser.raw({type: 'application/jwt'}));
+//app.use(bodyParser.urlencoded({ extended: true }));
 
-require('./app/routes')(app); // ROUTE DOSYASI ÇAĞIRILDI
+//app.use(express.methodOverride());
+//app.use(express.favicon());
 
-/*
+app.use(express.static(path.join(__dirname, 'public')));
 
-HTTP SERVER OLUŞTURULDU
+// Express in Development Mode
+if ('development' == app.get('env')) {
+  app.use(errorhandler());
+}
 
-*/
+// HubExchange Routes
+app.get('/', routes.index );
+app.post('/login', routes.login );
+app.post('/logout', routes.logout );
+
+
 http.createServer(app).listen(app.get('port'), function(){
-	console.log('Sistem ' + app.get('port') + ' Portu Üzerinde Çalışıyor.');
+  console.log('Express server listening on port ' + app.get('port'));
 });
